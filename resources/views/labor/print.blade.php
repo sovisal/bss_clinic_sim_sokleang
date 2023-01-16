@@ -62,7 +62,7 @@
 		</section>
 		<div class="signature">
 			<div class="text-center">ថ្ងៃទី {{ date('d/m/Y', strtotime($labor->requested_at)) }}</div>
-            <div class="text-center">វេជ្ជបណ្ឌិត៖ <span class="KHMOULLIGHT">{{ d_obj($echography, 'doctor', ['name_kh']) }}</span></div>
+            <div class="text-center">វេជ្ជបណ្ឌិត៖ <span class="KHMOULLIGHT">{{ d_obj($labor, 'doctor', ['name_kh']) }}</span></div>
 			<img src="{{ asset('images/site/signature.png') }}" alt="">
 		</div>
 
