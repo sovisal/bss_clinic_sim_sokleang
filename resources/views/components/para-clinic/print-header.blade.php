@@ -6,13 +6,16 @@
 <header>
     <table class="table-header" width="100%">
         <tr>
-            <td width="15%">
+            <td width="13%">
                 <img src="{{ asset('images/site/logo.png') }}" alt="">
             </td>
             <td class="text-center">
                 <h2 class="KHMOULLIGHT text-blue">{{ $_POST['setting']->clinic_name_kh }}</h2>
                 <h1 class="text-bold text-blue">{{ $_POST['setting']->clinic_name_en }}</h1>
                 <div>{!! $_POST['setting']->description !!}</div>
+            </td>
+            <td width="13%">
+                <img src="{{ asset('images/site/logo-2.png') }}" alt="">
             </td>
         </tr>
     </table>
