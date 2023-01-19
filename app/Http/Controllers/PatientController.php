@@ -75,7 +75,7 @@ class PatientController extends Controller
                 'enterprise'
             ]);
             if (request()->ft_address_id) {
-                $data['address_options'] = get4LevelAdressSelectorByID(request()->ft_address_id, ...['xx', 'option'])[0] ?? [];
+                $data['address_options'] = get4LevelAdressSelector(request()->ft_address_id, 'option')[0] ?? [];
             } else {
                 $data['address_options'] = get4LevelAdressSelector('xx', 'option')[0] ?? [];
             }
