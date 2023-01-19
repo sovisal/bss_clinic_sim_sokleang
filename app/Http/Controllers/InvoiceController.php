@@ -28,7 +28,7 @@ class InvoiceController extends Controller
     {
         if ($request->ajax()) {
             $data =  Invoice::with(['doctor', 'patient', 'gender', 'address', 'user'])
-                ->filter();
+                ->paraFilter();
 
             return Datatables::of($data)
                 ->addColumn('dt', function ($r) {

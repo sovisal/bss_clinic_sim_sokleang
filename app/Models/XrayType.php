@@ -10,4 +10,9 @@ class XrayType extends BaseModel
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
+
+    public function xrays()
+    {
+        return $this->hasMany(Xray::class, 'type_id');
+    }
 }

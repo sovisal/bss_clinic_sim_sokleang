@@ -1,4 +1,9 @@
 <x-app-layout>
+    <x-slot name="header">
+        @can('CreatePrescription')
+        <x-form.button href="{{ route('prescription.create') }}" label="Create" icon="bx bx-plus" />
+        @endcan
+    </x-slot>
     <x-slot name="js">
         <script>
             let table_columns   = [
@@ -14,20 +19,15 @@
                 {data: 'dt.price', name: 'price'}, 
                 {data: 'dt.payment_status', name: 'payment_status'}, 
                 // {data: 'dt.user', name: 'id', orderable: false, searching: false}, 
-                {data: 'dt.status', name: 'id', orderable: false, searching: false}, 
-                {data: 'dt.action', name: 'id', orderable: false, searching: false },
+                {data: 'dt.status', orderable: false, name: 'patient.name_en'},
+                {data: 'dt.action', orderable: false, name: 'patient.name_kh'},
             ];
 
             initDatatableDynamic('#datatables_server', '', table_columns);
         </script>
     </x-slot>
-    <x-slot name="header">
-        @can('CreatePrescription')
-        <x-form.button href="{{ route('prescription.create') }}" label="Create" icon="bx bx-plus" />
-        @endcan
-    </x-slot>
-    
-    <x-report-filter url="{{ route('prescription.index') }}" />
+
+    <x-filter-report />
     <x-card :foot="false" :action-show="false">
         <x-table class="table-hover table-striped" id="datatables_server" data-table="patients">
             <x-slot name="thead">
@@ -55,7 +55,8 @@
             @foreach([] as $row)
             <tr>
                 <td>{{ ++$i }}</td>
-                <td>{!! d_link($row->code, "javascript:getDetail(" . $row->id . ", '" . route('prescription.getDetail', 'Priscription Detail') . "')") !!}</td>
+                <td>{!! d_link($row->code, "javascript:getDetail(" . $row->id . ", '" . route('prescription.getDetail', 'Priscription Detail') . "')")
+                    !!}</td>
                 <td>{!! d_obj($row, 'patient', 'link') !!}</td>
                 <td>{{ d_obj($row, 'gender', ['title_en', 'title_kh']) }}</td>
                 <td>{{ d_obj($row, 'age') }}</td>
@@ -67,17 +68,12 @@
                 <td>{{ d_obj($row, 'user', 'name') }}</td>
                 <td>{!! d_para_status($row->status) !!}</td>
                 <td>
-                    <x-table-action-btn
-                        module="prescription"
-                        module-ability="Prescription"
-                        :id="$row->id"
-                        :is-trashed="$row->trashed()"
+                    <x-table-action-btn module="prescription" module-ability="Prescription" :id="$row->id" :is-trashed="$row->trashed()"
                         :disable-edit="$row->trashed() || !($row->status=='1' && $row->payment_status == 0)"
-                        :disable-delete="!($row->status=='1' && $row->payment_status == 0)"
-                        :show-btn-show="false"
-                    >
+                        :disable-delete="!($row->status=='1' && $row->payment_status == 0)" :show-btn-show="false">
                         @can('PrintPrescription')
-                        <x-form.button color="dark" class="btn-sm" onclick="printPopup('{{ route('prescription.print', $row->id) }}')" icon="bx bx-printer" />
+                        <x-form.button color="dark" class="btn-sm" onclick="printPopup('{{ route('prescription.print', $row->id) }}')"
+                            icon="bx bx-printer" />
                         @endcan
                     </x-table-action-btn>
                 </td>

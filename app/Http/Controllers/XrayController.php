@@ -20,7 +20,7 @@ class XrayController extends Controller
     {
         if ($request->ajax()) {
             $data =  Xray::with(['address', 'doctor_requested', 'doctor', 'patient', 'type', 'address', 'gender'])
-                ->filter();
+                ->paraFilter();
 
             return Datatables::of($data)
                 ->addColumn('dt', function ($r) {
@@ -93,8 +93,13 @@ class XrayController extends Controller
             'exchange_rate' => d_exchange_rate(),
             'attribute' => $xray_type ? $xray_type->attribite : null,
         ])) {
-            update4LevelAddress($request, $xray->patient()->first()->address_id);
-            $xray->update(['address_id' => update4LevelAddress($request)]);
+            if ($request->is_treament_plan) {
+                $patient = $xray->patient()->first();
+                $xray->update(['address_id' => duplicate4LevelAddress($request, $patient->address()->first()), 'age' => $patient->age, 'gender_id' => $patient->gender_id]);
+            } else {
+                update4LevelAddress($request, $xray->patient()->first()->address_id);
+                $xray->update(['address_id' => update4LevelAddress($request)]);
+            }
 
             // Check if no exist folder/directory then create folder/directory
             $path = public_path('/images/xrays/');

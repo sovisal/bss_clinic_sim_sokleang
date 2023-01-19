@@ -14,5 +14,10 @@ class LaborItem extends BaseModel
 	public function type()
 	{
 		return $this->belongsTo(LaborType::class, 'type_id');
-	}
+    }
+
+    public function labor_details()
+    {
+        return $this->hasMany(LaborDetail::class, 'labor_item_id');
+    }
 }

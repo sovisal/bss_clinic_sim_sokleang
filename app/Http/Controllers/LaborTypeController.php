@@ -5,22 +5,41 @@ namespace App\Http\Controllers;
 use App\Models\LaborType;
 use App\Http\Requests\LaborTypeRequest;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class LaborTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $laborTypes = LaborType::with('user')
-            ->where('labor_types.status', 1)
-            ->with('parent')
-            ->orderBy('labor_types.index', 'asc')
-            ->filterTrashed()
-            ->get();
-        $data['rows'] = $laborTypes;
-        return view('labor_type.index', $data);
+        if ($request->ajax()) {
+            $data = LaborType::with('user')->with('parent')->withCount('items');
+
+            return Datatables::of($data)
+                ->addColumn('dt', function ($r) {
+                    return [
+                        'name' => d_obj($r, ['name_kh', 'name_en']),
+                        'index' => d_number($r->index),
+                        'parent' => d_obj($r, 'parent', ['name_en', 'name_kh']),
+                        'items_count' => d_badge($r->items_count),
+                        'user' => d_obj($r, 'user', 'name'),
+                        'status' => d_status($r->status),
+                        'action' => d_action([
+                            'id' => $r->id, 'isTrashed' => $r->trashed(),
+                            'module' => 'setting.labor-type', 'moduleAbility' => 'LaborType', 
+                            'disableEdit' => $r->trashed() || $r->status != '1',
+                            'disableDelete' => $r->items_count > 0 || $r->status != 1,
+                            'showCustomBtn' => ['ViewAnyLaborItem', route('setting.labor-item.index', $r->id)]
+                        ]),
+                    ];
+                })
+                ->rawColumns(['dt.items_count', 'dt.status', 'dt.action'])
+                ->make(true);
+        } else {
+            return view('labor_type.index');
+        }
     }
 
     /**

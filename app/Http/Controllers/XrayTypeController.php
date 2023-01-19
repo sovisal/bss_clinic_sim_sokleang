@@ -4,20 +4,43 @@ namespace App\Http\Controllers;
 
 use App\Models\XrayType;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class XrayTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->data['rows'] = XrayType::with(['user'])
-            ->where('status', 1)
-            ->filterTrashed()
-            ->orderBy('index', 'asc')
-            ->get();
-        return view('xray_type.index', $this->data);
+        if ($request->ajax()) {
+            $data =  XrayType::with(['user'])
+            ->withCount('xrays');
+
+            return Datatables::of($data)
+                ->addColumn('dt', function ($r) {
+                    return [
+                        'name' => d_obj($r, ['name_kh', 'name_en']),
+                        'price' => d_currency($r->price),
+                        'index' => d_number($r->index),
+                        'user' => d_obj($r, 'user', 'name'),
+                        'age' => d_obj($r, 'age'),
+                        'xrays_count' => d_badge($r->xrays_count),
+                        'status' => d_status($r->status),
+                        'action' => d_action([
+                            'id' => $r->id, 'isTrashed' => $r->trashed(),
+                            'module' => 'setting.xray-type', 'moduleAbility' => 'XRayType', 
+                            'disableEdit' => $r->trashed() || $r->status != '1',
+                            'showBtnShow' => false, 
+                            'disableDelete' => $r->xrays_count > 0 || $r->status != '1',
+                        ]),
+                    ];
+                })
+                ->rawColumns(['dt.xrays_count', 'dt.status', 'dt.action'])
+                ->make(true);
+        } else {
+            return view('xray_type.index');
+        }
     }
 
     /**

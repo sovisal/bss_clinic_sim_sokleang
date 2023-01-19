@@ -3,19 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use Illuminate\Http\Request;
 use App\Http\Requests\DoctorRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class DoctorController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = [
-            'doctors' => Doctor::with(['user', 'address'])->orderBy('name_kh', 'asc')->get()
-        ];
-        return view('doctor.index', $data);
+        if ($request->ajax()) {
+            $data = Doctor::with(['user', 'address'])
+                ->withCount('ecgs')
+                ->withCount('xrays')
+                ->withCount('labors')
+                ->withCount('echos')
+                ->withCount('prescriptions')
+                ->withCount('invoices');
+
+            return Datatables::of($data)
+                ->addColumn('dt', function ($r) {
+                    return [
+                        'code' => 'DT-' . str_pad($r->id, 6, '0', STR_PAD_LEFT),
+                        'name' => d_obj($r, ['name_en', 'name_kh']),
+                        'gender' => d_obj($r, 'gender', ['title_kh', 'title_kh']),
+                        'phone' => d_text($r->phone),
+                        'email' => d_text($r->email),
+                        'address' => d_obj($r, 'address', ['village_kh', 'commune_kh', 'district_kh', 'province_kh']),
+                        'user' => d_obj($r, 'user', 'name'),
+                        'status' => d_status($r->status),
+                        'action' => d_action([
+                            'id' => $r->id, 'isTrashed' => $r->trashed(),
+                            'module' => 'setting.doctor', 'moduleAbility' => 'Doctor', 
+                            'disableEdit' => $r->trashed() || $r->status != '1',
+                            'showBtnShow' => false, 
+                            'disableDelete' => $r->ecgs_count > 0 || $r->xrays_count > 0 || $r->labors_count > 0 || $r->echos_count > 0 || $r->prescriptions_count > 0 || $r->invoices_count > 0 || $r->status != '1',
+                        ]),
+                    ];
+                })
+                ->rawColumns(['dt.ecgs_count', 'dt.status', 'dt.action'])
+                ->make(true);
+        } else {
+            return view('doctor.index');
+        }
     }
 
     /**

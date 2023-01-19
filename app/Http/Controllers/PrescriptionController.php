@@ -22,7 +22,7 @@ class PrescriptionController extends Controller
     {
         if ($request->ajax()) {
             $data =  Prescription::with(['patient', 'gender', 'doctor', 'doctor_requested', 'address'])
-                ->filter();
+                ->paraFilter();
 
             return Datatables::of($data)
                 ->addColumn('dt', function ($r) {
@@ -97,8 +97,14 @@ class PrescriptionController extends Controller
             'exchange_rate' => d_exchange_rate(),
             'attribite' => $request->attribite,
         ])) {
-            update4LevelAddress($request, $pre->patient()->first()->address_id);
-            $pre->update(['address_id' => update4LevelAddress($request)]);
+            if ($request->is_treament_plan) {
+                $patient = $pre->patient()->first();
+                $pre->update(['address_id' => duplicate4LevelAddress($request, $patient->address()->first()), 'age' => $patient->age, 'gender_id' => $patient->gender_id]);
+            } else {
+                update4LevelAddress($request, $pre->patient()->first()->address_id);
+                $pre->update(['address_id' => update4LevelAddress($request)]);
+            }
+
             $this->refresh_prescriotion_detail($request, $pre);
             if ($request->is_treament_plan) {
                 return redirect()->route('patient.consultation.edit', $request->consultation_id)->with('success', 'Data created success');

@@ -266,6 +266,14 @@ function update4LevelAddress($request, $address_id = null)
     }
 }
 
+function duplicate4LevelAddress($request, $obj_source) {
+    $request->pt_province_id = $obj_source->province_code;
+    $request->pt_district_id = $obj_source->district_code;
+    $request->pt_commune_id = $obj_source->commune_code;
+    $request->pt_village_id = $obj_source->village_code;
+    return app('App\Http\Controllers\AddressLinkableController')->store($request);
+}
+
 function delete4LevelAddress($addres_id)
 {
     return app('App\Http\Controllers\AddressLinkableController')->destroy($addres_id);
@@ -571,6 +579,7 @@ function d_action($param)
         'disableShow' => false, 'disableEdit' => false, 'disableDelete' => false, 'disableRestore' => false, 'disableForceDelete' => false,
         'showBtnShow' => true, 'showBtnEdit' => true, 'showBtnDelete' => true, 'showBtnRestore' => true, 'showBtnForceDelete' => false,
         'paraImage' => [], 'showBtnPrint' => false,
+        'showCustomBtn' => [], 'deleteCustomBtn' => [], 'editCustomBtn' => [],
     ] as $field => $val) { $param[$field] = $param[$field] ?? $val; }
     
 
@@ -589,16 +598,33 @@ function d_action($param)
             </a> ';
         }
     }
-
-    if($param['showBtnShow']) {
+    
+    
+    if($param['showCustomBtn']) {
+        if (can($param['showCustomBtn'][0])) {
+            $render_result .= '<a href="' . $param['showCustomBtn'][1] . '" class="btn btn-sm btn-primary btn-icon">
+                <i class="bx bx-detail"></i> 
+            </a> ';
+        }
+    } elseif($param['showBtnShow']) {
         if (can('ViewAny'. Str::ucfirst($param['moduleAbility'] ?? $param['module']))) {
             $render_result .= '<a href="' . route($param['module'] .'.show', $param['id']) . '" class="btn btn-sm btn-primary btn-icon" title="Show">
                 <i class="bx bx-detail"></i> 
-            </a>';
+            </a> ';
         }
     }
 
-    if($param['showBtnEdit']) {
+    if ($param['editCustomBtn']) {
+        if (can($param['editCustomBtn'][0])) {
+            if ($param['disableEdit']) {
+                $render_result .= ' <a href="#" class="btn btn-sm btn-secondary btn-icon btn-sm disabled"><i class="bx bx-edit-alt"></i></a> ';
+            } else {
+                $render_result .= ' <a href="' . $param['editCustomBtn'][1] . '" class="btn btn-sm btn-secondary btn-icon btn-sm" title="Edit">
+                    <i class="bx bx-edit-alt"></i>
+                </a> ';
+            }
+        }
+    } elseif($param['showBtnEdit']) {
         if (can('Update'. Str::ucfirst($param['moduleAbility'] ?? $param['module']))) {
             if ($param['disableEdit']) {
                 $render_result .= ' <a href="#" class="btn btn-sm btn-secondary btn-icon btn-sm disabled"><i class="bx bx-edit-alt"></i></a> ';
@@ -610,7 +636,24 @@ function d_action($param)
         }
     }
 
-    if($param['showBtnDelete']) {
+    if($param['deleteCustomBtn']) {
+        if (can($param['deleteCustomBtn'][0])) {
+            if ($param['disableDelete']) {
+                $render_result .= '<button type="button" class="btn btn-sm btn-danger btn-icon btn-sm disabled">
+                    <i class="bx bx-trash"></i> 
+                </button> ';
+            } else {
+                $render_result .= '<button type="button" class="btn btn-sm btn-danger btn-icon confirmDelete btn-sm" data-id="' . $param['id'] . '" title="Delete">
+                    <i class="bx bx-trash"></i> 
+                </button>
+                <form class="sr-only" id="form-delete-' . $param['id'] . '" action="' . $param['deleteCustomBtn'][1] . '" method="POST">
+                    <input type="hidden" name="_token" value="' . csrf_token() .'" />
+                    <input type="hidden" name="_method" value="delete" />
+                    <button class="sr-only" id="btn-' . $param['id'] . '">Delete</button>
+                </form> ';
+            }
+        }
+    } elseif($param['showBtnDelete']) {
         if (can('Delete'. Str::ucfirst($param['moduleAbility'] ?? $param['module']))) {
             if ($param['disableDelete']) {
                 $render_result .= '<button type="button" class="btn btn-sm btn-danger btn-icon btn-sm disabled">

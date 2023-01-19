@@ -47,7 +47,7 @@ class StockInController extends Controller
                     'status' => $r->qty_remain > 0 ? d_status(true, '', 'Stock Active') : d_status(false, 'Stock Closed', '', 'badge-light'),
                     'action' => d_action([
                         'module' => "inventory.stock_in",
-                        'module-ability' => "StockIn",
+                        'moduleAbility' => "StockIn",
                         'id' => $r->id,
                         'isTrashed' => $r->trashed(),
                         'disableEdit' => $r->trashed(),

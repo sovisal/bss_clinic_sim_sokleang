@@ -12,7 +12,6 @@
 		{!! $css ?? '' !!}
 		<!-- Styles: End -->
 		<script>
-			window.stock_inventory = JSON.parse("{{ json_encode(env('STOCK_INVENTORY', false)) }}");
 			window.route_medicine = "{{ route('setting.medicine.store') }}";
 			window.route_patient = "{{ route('patient.store') }}";
 			window.route_service = "{{ route('invoice.service.store') }}";

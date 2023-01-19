@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-form.button-back href="{{ route('prescription.index') }}" />
+        <x-form.button-back href="{{ route('prescription.index') }}"/>
     </x-slot>
     <x-slot name="js">
         <script>
             $(document).ready(function () {
-                $('.bx-trash').parent().hide();
-            });
+				$('.bx-trash').parent().hide();
+			});
         </script>
     </x-slot>
     <x-card bodyClass="pb-0">

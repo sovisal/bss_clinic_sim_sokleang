@@ -21,7 +21,7 @@ class EchographyController extends Controller
     {
         if ($request->ajax()) {
             $data =  Echography::with(['address', 'doctor', 'doctor_requested', 'patient', 'type', 'address', 'gender'])
-                ->filter();
+                ->paraFilter();
 
             return Datatables::of($data)
                 ->addColumn('dt', function ($r) {
@@ -96,8 +96,13 @@ class EchographyController extends Controller
             'exchange_rate' => d_exchange_rate(),
             'attribute' => $echo_type ? $echo_type->attribite : null,
         ])) {
-            update4LevelAddress($request, $echo->patient()->first()->address_id);
-            $echo->update(['address_id' => update4LevelAddress($request)]);
+            if ($request->is_treament_plan) {
+                $patient = $echo->patient()->first();
+                $echo->update(['address_id' => duplicate4LevelAddress($request, $patient->address()->first()), 'age' => $patient->age, 'gender_id' => $patient->gender_id]);
+            } else {
+                update4LevelAddress($request, $echo->patient()->first()->address_id);
+                $echo->update(['address_id' => update4LevelAddress($request)]);
+            }
 
             // Check if no exist folder/directory then create folder/directory
             $path = public_path('/images/echographies/');

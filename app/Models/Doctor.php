@@ -18,4 +18,28 @@ class Doctor extends BaseModel
             return d_obj($this, ['name_en', 'name_kh']);
         }
     }
+
+    function ecgs () {
+        return $this->hasMany(Ecg::class, 'doctor_id');
+    }
+
+    function xrays () {
+        return $this->hasMany(Xray::class, 'doctor_id');
+    }
+
+    function labors () {
+        return $this->hasMany(Laboratory::class, 'doctor_id');
+    }
+
+    function echos () {
+        return $this->hasMany(Echography::class, 'doctor_id');
+    }
+
+    function prescriptions () {
+        return $this->hasMany(Prescription::class, 'doctor_id');
+    }
+
+    function invoices () {
+        return $this->hasMany(Invoice::class, 'doctor_id');
+    }
 }

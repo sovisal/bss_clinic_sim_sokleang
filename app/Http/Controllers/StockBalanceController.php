@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inventory\Product;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class StockBalanceController extends Controller
 {
@@ -14,9 +14,9 @@ class StockBalanceController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Product::with(['unit', 'type', 'category']);
+            $data = Product::with(['unit', 'type', 'category'])->filter();
 
-            return Datatables::of($data)
+            return DataTables::of($data)
                 ->addColumn('dt', function ($r) {
                     return [
                         'code' => $r->code,

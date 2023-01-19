@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EcgType;
 use Illuminate\Http\Request;
 use App\Http\Requests\EcgTypeRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class EcgTypeController extends Controller
 {
@@ -12,14 +13,36 @@ class EcgTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data['rows'] = EcgType::with('user')
-            ->where('status', 1)
-            ->filterTrashed()
-            ->orderBy('index', 'asc')
-            ->get();
-        return view('ecg_type.index', $data);
+        if ($request->ajax()) {
+            $data =  EcgType::with('user')
+            ->withCount('ecgs');
+
+            return Datatables::of($data)
+                ->addColumn('dt', function ($r) {
+                    return [
+                        'name' => d_obj($r, ['name_kh', 'name_en']),
+                        'price' => d_currency($r->price),
+                        'index' => d_number($r->index),
+                        'user' => d_obj($r, 'user', 'name'),
+                        'age' => d_obj($r, 'age'),
+                        'ecgs_count' => d_badge($r->ecgs_count),
+                        'status' => d_status($r->status),
+                        'action' => d_action([
+                            'id' => $r->id, 'isTrashed' => $r->trashed(),
+                            'module' => 'setting.ecg-type', 'moduleAbility' => 'EcgType', 
+                            'disableEdit' => $r->trashed() || $r->status != '1',
+                            'showBtnShow' => false, 
+                            'disableDelete' => $r->ecgs_count > 0 || $r->status != '1',
+                        ]),
+                    ];
+                })
+                ->rawColumns(['dt.ecgs_count', 'dt.status', 'dt.action'])
+                ->make(true);
+        } else {
+            return view('ecg_type.index');
+        }
     }
 
     /**

@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         @if(isset($_GET['back']))
-        <x-form.button-back href="{!! route('setting.xray-type.index') !!}"/>
+        <x-form.button-back href="{!! route('setting.xray-type.index') !!}" />
         @endif
         @can('CreateEcg')
-        <x-form.button href="{{ route('para_clinic.ecg.create') }}" label="Create" icon="bx bx-plus"/>
+        <x-form.button href="{{ route('para_clinic.ecg.create') }}" label="Create" icon="bx bx-plus" />
         @endcan
     </x-slot>
     <x-slot name="css">
@@ -14,6 +14,7 @@
                 margin: 10px auto;
                 overflow: hidden;
             }
+
             #image-slider .carousel-inner {
                 border-radius: 0;
             }
@@ -60,15 +61,15 @@
                 {data: 'dt.price', name: 'price'}, 
                 {data: 'dt.payment_status', name: 'payment_status'}, 
                 // {data: 'dt.user', name: 'id', orderable: false, searching: false}, 
-                {data: 'dt.status', name: 'id', orderable: false, searching: false}, 
-                {data: 'dt.action', name: 'id', orderable: false, searching: false },
+                {data: 'dt.status', orderable: false, name: 'patient.name_en'},
+                {data: 'dt.action', orderable: false, name: 'patient.name_kh'},
             ];
 
             initDatatableDynamic('#datatables_server', '', table_columns);
         </script>
     </x-slot>
 
-    <x-report-filter url="{{ route('para_clinic.ecg.index') }}"/>
+    <x-filter-report url="{{ route('para_clinic.ecg.index') }}" />
     <x-card :foot="false" :action-show="false" :head="false">
         <x-table class="table-hover table-striped" id="datatables_server" data-table="patients">
             <x-slot name="thead">
@@ -93,7 +94,8 @@
             @foreach([] as $i => $row)
             <tr>
                 <td>{{ ++$i }}</td>
-                <td>{!! d_link($row->code, "javascript:getDetail(" . $row->id . ", '" . route('para_clinic.ecg.getDetail', 'ECG Detail') . "')") !!}</td>
+                <td>{!! d_link($row->code, "javascript:getDetail(" . $row->id . ", '" . route('para_clinic.ecg.getDetail', 'ECG Detail') . "')") !!}
+                </td>
                 <td>{!! $row->typeLink !!}</td>
                 <td>{!! d_obj($row, 'patient', 'link') !!}</td>
                 <td>{{ d_obj($row, 'gender', ['title_en', 'title_kh']) }}</td>
@@ -106,18 +108,14 @@
                 <td>{{ d_obj($row, 'user', 'name') }}</td>
                 <td>{!! d_para_status($row->status) !!}</td>
                 <td>
-                    <x-table-action-btn
-                        module="para_clinic.ecg"
-                        module-ability="Ecg"
-                        :id="$row->id"
-                        :is-trashed="$row->trashed()"
+                    <x-table-action-btn module="para_clinic.ecg" module-ability="Ecg" :id="$row->id" :is-trashed="$row->trashed()"
                         :disable-edit="$row->trashed() || !($row->status=='1' && $row->payment_status == 0)"
-                        :disable-delete="!($row->status=='1' && $row->payment_status == 0)"
-                        :show-btn-show="false"
-                    >
-                        <x-form.button color="warning" class="btn-sm" onclick="getImage('{{ $row->image_1 }}', '{{ $row->image_2 }}')" icon="bx bx-image" />
+                        :disable-delete="!($row->status=='1' && $row->payment_status == 0)" :show-btn-show="false">
+                        <x-form.button color="warning" class="btn-sm" onclick="getImage('{{ $row->image_1 }}', '{{ $row->image_2 }}')"
+                            icon="bx bx-image" />
                         @can('PrintEcg')
-                            <x-form.button color="dark" class="btn-sm" onclick="printPopup('{{ route('para_clinic.ecg.print', $row->id) }}')" icon="bx bx-printer" />
+                        <x-form.button color="dark" class="btn-sm" onclick="printPopup('{{ route('para_clinic.ecg.print', $row->id) }}')"
+                            icon="bx bx-printer" />
                         @endcan
                     </x-table-action-btn>
                 </td>

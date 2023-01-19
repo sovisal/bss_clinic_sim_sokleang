@@ -28,12 +28,14 @@
         <x-form.button href="{{ route('inventory.stock_in.create') }}" icon="bx bx-plus" label="Create" />
         @endcan
     </x-slot>
-    <x-stock-filter url="{{ route('inventory.stock_in.index') }}">
+    <x-filter-stock url="{{ route('inventory.stock_in.index') }}">
         <div class="col-sm-3 col-md-2">
-            <x-form.select name="ft_supplier_id" :url="route('inventory.supplier.index')" onchange="$('#form-filter').submit()" label="{{ __('form.stock.supplier') }}">
+            <x-form.select name="ft_supplier_id" :url="route('inventory.supplier.index')" onchange="$('#form-filter').submit()"
+                label="{{ __('form.stock.supplier') }}">
                 <option value="">{{ __('form.all') }}</option>
                 @foreach ($suppliers as $supplier)
-                <option value="{{ $supplier->id }}" @selected($supplier->id == request()->ft_supplier_id)>{{ d_obj($supplier, ['name_en', 'name_kh']) }}</option>
+                <option value="{{ $supplier->id }}" @selected($supplier->id == request()->ft_supplier_id)>{{ d_obj($supplier, ['name_en', 'name_kh'])
+                    }}</option>
                 @endforeach
             </x-form.select>
         </div>
@@ -43,27 +45,28 @@
                     <x-form.select name="ft_status" data-no_search="true" onchange="$('#form-filter').submit()" label="{{ __('form.stock.status') }}">
                         <option value="">{{ __('form.all') }}</option>
                         @foreach ([
-                            'active' => 'Active',
-                            'closed' => 'Closed'
+                        'active' => 'Active',
+                        'closed' => 'Closed'
                         ] as $key => $name)
-                            <option value="{{ $key }}" @selected($key == request()->ft_status)>{{ d_text($name) }}</option>
+                        <option value="{{ $key }}" @selected($key==request()->ft_status)>{{ d_text($name) }}</option>
                         @endforeach
                     </x-form.select>
                 </div>
                 <div class="col-md-6">
-                    <x-form.select name="ft_exp_status" data-no_search="true" onchange="$('#form-filter').submit()" label="{{ __('form.stock.exp_status') }}">
+                    <x-form.select name="ft_exp_status" data-no_search="true" onchange="$('#form-filter').submit()"
+                        label="{{ __('form.stock.exp_status') }}">
                         <option value="">{{ __('form.all') }}</option>
                         @foreach ([
-                            'active' => 'Active',
-                            'expired' => 'Expired',
+                        'active' => 'Active',
+                        'expired' => 'Expired',
                         ] as $key => $name)
-                            <option value="{{ $key }}" @selected($key == request()->ft_exp_status)>{{ d_text($name) }}</option>
+                        <option value="{{ $key }}" @selected($key==request()->ft_exp_status)>{{ d_text($name) }}</option>
                         @endforeach
                     </x-form.select>
                 </div>
             </div>
         </div>
-    </x-stock-filter>
+    </x-filter-stock>
     <x-card :foot="false" :head="false">
         <x-table class="table-hover table-striped" id="datatables_server">
             <x-slot name="thead">
@@ -102,29 +105,22 @@
                 <td>{{ d_number($row->qty_used) }}</td>
                 <td>{{ d_number($row->qty_remain) }}</td>
 
-                @if ($row->exp_date > date('Y-m-d')) 
-                    <td>{!! d_status(true, '', d_date($row->exp_date, 'Y-m-d'), '', 'badge-success') !!}</td>
+                @if ($row->exp_date > date('Y-m-d'))
+                <td>{!! d_status(true, '', d_date($row->exp_date, 'Y-m-d'), '', 'badge-success') !!}</td>
                 @else
-                    <td>{!! d_status(false, d_date($row->exp_date, 'Y-m-d')) !!}</td>
+                <td>{!! d_status(false, d_date($row->exp_date, 'Y-m-d')) !!}</td>
                 @endif
-                
+
                 <td>{{ $row->reciept_no }}</td>
                 {{-- <td>{{ d_obj($row, 'user', 'name') }}</td> --}}
                 @if ($row->qty_remain > 0)
-                    <td>{!! d_status(true, '', 'Stock Active') !!}</td>
+                <td>{!! d_status(true, '', 'Stock Active') !!}</td>
                 @else
-                    <td>{!! d_status(false, 'Stock Closed', '', 'badge-light') !!}</td>
+                <td>{!! d_status(false, 'Stock Closed', '', 'badge-light') !!}</td>
                 @endif
                 <td>
-                    <x-table-action-btn
-                        module="inventory.stock_in"
-                        module-ability="StockIn"
-                        :id="$row->id"
-                        :is-trashed="$row->trashed()"
-                        :disable-edit="$row->trashed()"
-                        :disable-delete="$row->stock_outs_count > 0"
-                        :show-btn-show="false"
-                    />
+                    <x-table-action-btn module="inventory.stock_in" module-ability="StockIn" :id="$row->id" :is-trashed="$row->trashed()"
+                        :disable-edit="$row->trashed()" :disable-delete="$row->stock_outs_count > 0" :show-btn-show="false" />
                 </td>
             </tr>
             @endforeach

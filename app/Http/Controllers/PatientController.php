@@ -23,6 +23,7 @@ class PatientController extends Controller
                 // For select2 Ajx
                 $term = Patient::where('name_en', 'LIKE', '%' . $request->term . '%')
                     ->orWhere('name_kh', 'LIKE', '%' . $request->term . '%')
+                    ->filter()
                     ->limit(100)->get(['id', 'name_kh', 'name_en']);
 
                 $result = [];
@@ -41,7 +42,8 @@ class PatientController extends Controller
                 ->withCount('xrays')
                 ->withCount('labors')
                 ->withCount('prescriptions')
-                ->withCount('invoices');
+                ->withCount('invoices')
+                ->filter();
 
             return DataTables::of($data)
                 ->addColumn('dt', function ($r) {
@@ -66,7 +68,18 @@ class PatientController extends Controller
                 ->rawColumns(['dt.status', 'dt.code', 'dt.action'])
                 ->make(true);
         } else {
-            return view('patient.index');
+            $data = getParentDataSelection([
+                'gender',
+                'nationality',
+                'marital_status',
+                'enterprise'
+            ]);
+            if (request()->ft_address_id) {
+                $data['address_options'] = get4LevelAdressSelectorByID(request()->ft_address_id, ...['xx', 'option'])[0] ?? [];
+            } else {
+                $data['address_options'] = get4LevelAdressSelector('xx', 'option')[0] ?? [];
+            }
+            return view('patient.index', $data);
         }
     }
 

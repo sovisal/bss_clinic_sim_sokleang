@@ -24,24 +24,24 @@
         <x-form.button href="{{ route(($module ?? 'inventory.stock_out') . '.create') }}" icon="bx bx-plus" label="Create" />
         @endcan
     </x-slot>
-    
-    <x-stock-filter url="{{ route(($module ?? 'inventory.stock_out') . '.index') }}">
+
+    <x-filter-stock url="{{ route(($module ?? 'inventory.stock_out') . '.index') }}">
         @if (!isset($module))
-            <div class="col-sm-3 col-md-2">
-                <x-form.select name="ft_type" onchange="$('#form-filter').submit()" label="{{ __('form.stock.type') }}">
-                    <option value="">{{ __('form.all') }}</option>
-                    @foreach ([
-                        'StockOut' => 'Stock Out',
-                        'StockAdjustment' => 'Stock Adjustment',
-                        'Prescription' => 'Prescription',
-                        'Invoice' => 'Invoice',
-                    ] as $key => $name)
-                        <option value="{{ $key }}" @selected($key == request()->ft_type)>{{ d_text($name) }}</option>
-                    @endforeach
-                </x-form.select>
-            </div>
+        <div class="col-sm-3 col-md-2">
+            <x-form.select name="ft_type" onchange="$('#form-filter').submit()" label="{{ __('form.stock.type') }}">
+                <option value="">{{ __('form.all') }}</option>
+                @foreach ([
+                'StockOut' => 'Stock Out',
+                'StockAdjustment' => 'Stock Adjustment',
+                'Prescription' => 'Prescription',
+                'Invoice' => 'Invoice',
+                ] as $key => $name)
+                <option value="{{ $key }}" @selected($key==request()->ft_type)>{{ d_text($name) }}</option>
+                @endforeach
+            </x-form.select>
+        </div>
         @endif
-    </x-stock-filter>
+    </x-filter-stock>
     <x-card :foot="false" :head="false">
         <x-table class="table-hover table-striped" id="datatables_server">
             <x-slot name="thead">
@@ -77,15 +77,9 @@
                 <td>{!! d_text($row->type) !!}</td>
                 {{-- <td>{!! d_obj($row, 'user', 'name') !!}</td> --}}
                 <td>
-                    <x-table-action-btn
-                        module="{{ $module ?? 'inventory.stock_out' }}"
-                        module-ability="{{ $module_ability ?? 'StockOut' }}"
-                        :id="$row->id"
-                        :is-trashed="$row->trashed()"
-                        :disable-edit="$row->trashed()"
-                        :show-btn-show="false"
-                        :show-btn-restore="false"
-                    />
+                    <x-table-action-btn module="{{ $module ?? 'inventory.stock_out' }}" module-ability="{{ $module_ability ?? 'StockOut' }}"
+                        :id="$row->id" :is-trashed="$row->trashed()" :disable-edit="$row->trashed()" :show-btn-show="false"
+                        :show-btn-restore="false" />
                 </td>
             </tr>
             @endforeach

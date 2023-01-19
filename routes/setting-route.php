@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\DataParentController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\FourLevelAddressController;
 
 Route::middleware(['auth'])->name('setting.')->group(function () {
@@ -61,5 +62,17 @@ Route::middleware(['auth'])->name('setting.')->group(function () {
         Route::delete('/{medicine}/force_delete', 'force_delete')->name('force_delete')->middleware('can:ForceDeleteMedicine');
         Route::post('/getUnit', 'getUnit')->name('getUnit');
         Route::post('/validateRemainQty', 'validateRemainQty')->name('validateRemainQty');
+    });
+    
+    Route::prefix('unit')->name('unit.')->controller(UnitController::class)->group(function () {
+        Route::get('/', 'index')->name('index')->middleware('can:ViewAnyProductUnit');
+        Route::get('/create', 'create')->name('create')->middleware('can:CreateProductUnit');
+        Route::post('/store', 'store')->name('store')->middleware('can:CreateProductUnit');
+        Route::get('/{productUnit}/edit', 'edit')->name('edit')->middleware('can:UpdateProductUnit');
+        Route::put('/{productUnit}/update', 'update')->name('update')->middleware('can:UpdateProductUnit');
+        Route::delete('/{productUnit}/delete', 'destroy')->name('delete')->middleware('can:DeleteProductUnit');
+        Route::put('/{productUnit}/restore', 'restore')->name('restore')->middleware('can:RestoreProductUnit');
+        Route::delete('/{productUnit}/force_delete', 'force_delete')->name('force_delete')->middleware('can:ForceDeleteProductUnit');
+        Route::post('/getPackage', 'getPackage')->name('getPackage');
     });
 });

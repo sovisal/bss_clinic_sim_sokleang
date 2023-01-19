@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\Inventory\ProductType;
 use App\Http\Requests\SupplierRequest;
 use App\Models\Inventory\ProductCategory;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class SupplierController extends Controller
 {
@@ -33,11 +33,9 @@ class SupplierController extends Controller
                 }
                 return ['results' => $result];
             }
+            $data = Supplier::with(['user', 'type', 'category'])->withCount('stockins')->filter();
 
-
-            $data = Supplier::with(['user', 'type', 'category'])->withCount('stockins');
-
-            return Datatables::of($data)
+            return DataTables::of($data)
                 ->addColumn('dt', function ($r) {
                     return [
                         'name' => d_obj($r, ['name_kh', 'name_en']),
@@ -51,7 +49,7 @@ class SupplierController extends Controller
 
                         'action' => d_action([
                             'module' => "inventory.supplier",
-                            'module-ability' => "Supplier",
+                            'moduleAbility' => "Supplier",
                             'id' => $r->id,
                             'isTrashed' => $r->trashed(),
                             'disableEdit' => $r->trashed(),

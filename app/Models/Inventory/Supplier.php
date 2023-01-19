@@ -11,6 +11,19 @@ class Supplier extends BaseModel
     use HasFactory, SoftDeletes;
     protected $guarded = ['id'];
 
+    public function scopeFilter($query)
+    {
+        $query->when(request()->ft_category_id, function ($query, $category_id) {
+            $query->where('category_id', '=', $category_id);
+        });
+        $query->when(request()->ft_type_id, function ($query, $type_id) {
+            $query->where('type_id', '=', $type_id);
+        });
+        $query->when(request()->ft_status, function ($query, $status) {
+            $query->where('status', (($status == 'active') ? 1 : 0));
+        });
+    }
+
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'category_id');

@@ -16,23 +16,40 @@
             </div>
         </div>
     </x-slot>
+    <x-slot name="js">
+        <script>
+            let table_columns   = [
+                {data: 'dt.name', name: 'name_en'},
+                {data: 'dt.range', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.type', name: 'id', orderable: false, searching: false},
+                {data: 'dt.other', name: 'other'},
+                {data: 'dt.index', name: 'index'},
+                {data: 'dt.labor_details_count', name: 'id', orderable: false, searching: false},
+                {data: 'dt.user', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.status', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.action', name: 'id', orderable: false, searching: false },
+            ];
+
+            initDatatableDynamic('#datatables_server', '', table_columns);
+        </script>
+    </x-slot>
     <x-card :foot="false" :head="false">
-        <x-table class="table-hover table-striped" id="datatables" data-table="patients">
+        <x-table class="table-hover table-striped" id="datatables_server" data-table="patients">
             <x-slot name="thead">
                 <tr>
-                    <th width="7%">No</th>
                     <th>Name</th>
-                    <th width="10%">Range - Unit</th>
-                    <th width="6%">Order</th>
-                    <th width="15%">Labor Type</th>
-                    <th width="10%">Item Type</th>
-                    <th width="8%">Status</th>
-                    <th width="10%">User</th>
-                    <th width="10%">Action</th>
+                    <th>Range - Unit</th>
+                    <th>Labor Type</th>
+                    <th>Item Type</th>
+                    <th>Order</th>
+                    <th>Total Labor</th>
+                    <th>Status</th>
+                    <th>User</th>
+                    <th>Action</th>
                 </tr>
             </x-slot>
             @php($i=0)
-            @foreach($rows as $row)
+            @foreach([] as $row)
             <tr>
                 <td>{{ ++$i }}</td>
                 <td>{{ d_obj($row, ['name_kh', 'name_en']) }}</td>

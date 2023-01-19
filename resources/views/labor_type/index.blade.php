@@ -13,7 +13,17 @@
     </x-slot>
     <x-slot name="js">
         <script>
-            
+            let table_columns   = [
+                {data: 'dt.name', name: 'name_en'},
+                {data: 'dt.parent', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.index', name: 'index'},
+                {data: 'dt.items_count', name: 'id', orderable: false, searching: false},
+                {data: 'dt.user', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.status', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.action', name: 'id', orderable: false, searching: false },
+            ];
+
+            initDatatableDynamic('#datatables_server', '', table_columns);
         </script>
     </x-slot>
 
@@ -22,20 +32,20 @@
         <x-slot name="header">
             <h5>Labor Service</h5>
         </x-slot>
-        <x-table class="table-hover table-striped" id="datatables">
+        <x-table class="table-hover table-striped" id="datatables_server">
             <x-slot name="thead">
                 <tr>
-                    <th width="8%">No</th>
                     <th>Name</th>
-                    <th width="10%">Order</th>
-                    <th width="15%">Parent</th>
-                    <th width="12%">Status</th>
-                    <th width="15%">User</th>
-                    <th width="15%">Action</th>
+                    <th>Parent</th>
+                    <th>Order</th>
+                    <th>Total Item</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </x-slot>
             @php($i=0)
-            @foreach($rows as $row)
+            @foreach([] as $row)
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ d_obj($row, ['name_kh', 'name_en']) }}</td>

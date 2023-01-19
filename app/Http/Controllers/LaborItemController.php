@@ -7,22 +7,46 @@ use App\Models\LaborType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Requests\LaborItemRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class LaborItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(LaborType $laborType)
+    public function index(Request $request, LaborType $laborType)
     {
-        $laborType->load([
-            'items' => function ($q) {
-                $q->filterTrashed();
-            }
-        ]);
-        $data['rows'] = $laborType->items;
-        $data['laborType'] = $laborType;
-        return view('labor_item.index', $data);
+        if ($request->ajax()) {
+            $data = $laborType->items()->with('user')->withCount('labor_details');
+
+            return Datatables::of($data)
+                ->addColumn('dt', function ($r) use ($laborType) {
+                    return [
+                        'name' => d_obj($r, ['name_kh', 'name_en']),
+                        'range' => d_labor_range($r->min_range, $r->max_range) .' '. apply_markdown_character($r->unit),
+                        'index' => d_number(Str::after($r->index, '.')),
+                        'type' => d_obj($r, 'type', ['name_en', 'name_kh']),
+                        'labor_details_count' => d_badge($r->labor_details_count),
+                        'other' => d_text($r->other),
+                        'user' => d_obj($r, 'user', 'name'),
+                        'status' => d_status($r->status),
+                        'action' => d_action([
+                            'id' => $r->id, 'isTrashed' => $r->trashed(),
+                            'module' => 'setting.labor-item', 'moduleAbility' => 'LaborItem',
+                            'showBtnShow' => false,
+                            'disableEdit' => $r->trashed() || $r->status != '1',
+                            'disableDelete' => $r->labor_details_count > 0 || $r->status != '1', 
+                            'deleteCustomBtn' => ['DeleteLaborItem', route('setting.labor-item.delete', [$laborType->id, $r->id])],
+                            'editCustomBtn' => ['UpdateLaborItem', route('setting.labor-item.edit', [$laborType->id, $r->id])],
+                        ]),
+                    ];
+                })
+                ->rawColumns(['dt.labor_details_count', 'dt.status', 'dt.action', 'dt.range'])
+                ->make(true);
+        } else {
+            $data['laborType'] = $laborType;
+            return view('labor_item.index', $data);
+        }
     }
 
     /**

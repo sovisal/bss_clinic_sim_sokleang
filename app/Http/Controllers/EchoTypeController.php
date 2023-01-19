@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EchoType;
 use Illuminate\Http\Request;
 use App\Http\Requests\EchoTypeRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class EchoTypeController extends Controller
 {
@@ -12,13 +13,36 @@ class EchoTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->data['rows'] = EchoType::with(['user'])->where('status', 1)
-            ->filterTrashed()
-            ->orderBy('index', 'asc')
-            ->get();
-        return view('echo_type.index', $this->data);
+        if ($request->ajax()) {
+            $data =  EchoType::with('user')
+            ->withCount('echos');
+
+            return Datatables::of($data)
+                ->addColumn('dt', function ($r) {
+                    return [
+                        'name' => d_obj($r, ['name_kh', 'name_en']),
+                        'price' => d_currency($r->price),
+                        'index' => d_number($r->index),
+                        'user' => d_obj($r, 'user', 'name'),
+                        'age' => d_obj($r, 'age'),
+                        'echos_count' => d_badge($r->echos_count),
+                        'status' => d_status($r->status),
+                        'action' => d_action([
+                            'id' => $r->id, 'isTrashed' => $r->trashed(),
+                            'module' => 'setting.echo-type', 'moduleAbility' => 'EchoType', 
+                            'disableEdit' => $r->trashed() || $r->status != '1',
+                            'showBtnShow' => false, 
+                            'disableDelete' => $r->echos_count > 0 || $r->status != '1',
+                        ]),
+                    ];
+                })
+                ->rawColumns(['dt.echos_count', 'dt.status', 'dt.action'])
+                ->make(true);
+        } else {
+            return view('echo_type.index');
+        }
     }
 
     /**

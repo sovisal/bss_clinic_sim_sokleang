@@ -13,8 +13,8 @@
                 {data: 'dt.total', name: 'total'}, 
                 {data: 'dt.payment_status', name: 'payment_status'}, 
                 {data: 'dt.user', name: 'id', orderable: false, searching: false}, 
-                {data: 'dt.status', name: 'id', orderable: false, searching: false}, 
-                {data: 'dt.action', name: 'id', orderable: false, searching: false },
+                {data: 'dt.status', orderable: false, name: 'patient.name_en'},
+                {data: 'dt.action', orderable: false, name: 'patient.name_kh'},
             ];
 
             initDatatableDynamic('#datatables_server', '', table_columns);
@@ -22,14 +22,14 @@
     </x-slot>
     <x-slot name="header">
         @if(isset($_GET['back']))
-        <x-form.button-back href="{!! route('setting.xray-type.index') !!}"/>
+        <x-form.button-back href="{!! route('setting.xray-type.index') !!}" />
         @endif
         @can('CreateInvoice')
         <x-form.button href="{{ route('invoice.create') }}" label="Create" icon="bx bx-plus" />
         @endcan
     </x-slot>
-    
-    <x-report-filter url="{{ route('invoice.index') }}" />
+
+    <x-filter-report />
     <x-card :foot="false" :action-show="false" :head="false">
         <x-table class="table-hover table-striped" id="datatables_server" data-table="patients">
             <x-slot name="thead">
@@ -71,17 +71,11 @@
                 <td>{!! d_obj($row, 'user', 'name') !!}</td>
                 <td>{!! d_para_status($row->status) !!}</td>
                 <td>
-                    <x-table-action-btn
-                        module="invoice"
-                        module-ability="Invoice"
-                        :id="$row->id"
-                        :is-trashed="$row->trashed()"
-                        :disable-edit="$row->trashed() || !($row->status == 1)"
-                        :disable-delete="!($row->status == 1)"
-                        :show-btn-show="false"
-                    >
+                    <x-table-action-btn module="invoice" module-ability="Invoice" :id="$row->id" :is-trashed="$row->trashed()"
+                        :disable-edit="$row->trashed() || !($row->status == 1)" :disable-delete="!($row->status == 1)" :show-btn-show="false">
                         @can('PrintInvoice')
-                        <x-form.button color="dark" class="btn-sm" onclick="printPopup('{{ route('invoice.print', $row->id) }}')" icon="bx bx-printer" />
+                        <x-form.button color="dark" class="btn-sm" onclick="printPopup('{{ route('invoice.print', $row->id) }}')"
+                            icon="bx bx-printer" />
                         @endcan
                     </x-table-action-btn>
                 </td>

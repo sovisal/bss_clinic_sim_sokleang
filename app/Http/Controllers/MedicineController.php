@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inventory\Product;
+use App\Models\Inventory\ProductUnit;
 use App\Http\Requests\MedicineRequest;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -44,7 +45,10 @@ class MedicineController extends Controller
      */
     public function create()
     {
-        $data = ['is_edit' => false];
+        $data = [
+            'is_edit' => false,
+            'units' => ProductUnit::where('status', 1)->orderBy('name_en', 'asc')->get()
+        ];
         return view('medicine.create', $data);
     }
 
@@ -62,14 +66,16 @@ class MedicineController extends Controller
         if ($medicine = Product::create([
             'name_en' => $request->name_en,
             'name_kh' => $request->name_kh,
-            'unit_id' => 1,
-            'cost' => $request->price ?? 0,
+            'unit_id' => $request->unit_id ?: 1,
+            'cost' => $request->cost ?? 0,
             'price' => $request->price ?? 0,
             'qty_remain' => 100,
         ])) {
             if ($request->ajax()) {
                 return $medicine;
             }
+
+            $this->update_package($request, $medicine);
 
             return redirect()->route('setting.medicine.index')->with('success', __('alert.message.success.crud.create'));
         }
@@ -83,6 +89,7 @@ class MedicineController extends Controller
         $data = [
             'row' => $medicine,
             'is_edit' => true,
+            'units' => ProductUnit::where('status', 1)->orderBy('name_en', 'asc')->get()
         ];
         return view('medicine.edit', $data);
     }
@@ -97,7 +104,9 @@ class MedicineController extends Controller
             'name_kh' => $request->name_kh,
             'cost' => $request->cost ?? 0,
             'price' => $request->price ?? 0,
+            'unit_id' => $request->unit_id ?: 1,
         ])) {
+            $this->update_package($request, $medicine);
 
             return redirect()->route('setting.medicine.index')->with('success', __('alert.message.success.crud.update'));
         }
@@ -135,5 +144,22 @@ class MedicineController extends Controller
             return back()->with('success', __('alert.message.success.crud.force_detele'));
         }
         return back()->with('error', __('alert.message.error.crud.force_detele'));
+    }
+
+    public function update_package($request, $product = null)
+    {
+        $package = [];
+        foreach ($request->package_product_unit_id ?: [] as $index => $product_unit_id) {
+            $package[] = [
+                'product_unit_id' => $product_unit_id,
+                'base_qty' => 1,
+                'qty' => $request->package_qty[$index] ?: 0,
+                'price' => $request->package_price[$index] ?: 0,
+                'code' => $request->package_code[$index] ?: 0,
+            ];
+        }
+
+        $product->packages()->where('status', '1')->delete();
+        $product->packages()->createMany($package);
     }
 }

@@ -21,6 +21,17 @@
             initDatatableDynamic('#datatables_server', '', table_columns);
         </script>
     </x-slot>
+    
+    <x-filter-product>
+        <div class="col-sm-3 col-md-2">
+            <x-form.select name="ft_status" class="filter-input" label="{{ __('form.status') }}">
+                <option value="">{{ __('form.all') }}</option>
+                @foreach (['active' => 'Active', 'inactive' => 'Inactive'] as $id => $value)
+                <option value="{{ $id }}" @selected($id == request()->ft_status)>{{ d_text($value) }}</option>
+                @endforeach
+            </x-form.select>
+        </div>
+    </x-filter-product>
     <x-card :foot="false" :head="false">
         <x-table class="table-hover table-striped" id="datatables_server">
             <x-slot name="thead">

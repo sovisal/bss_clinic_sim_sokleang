@@ -1283,7 +1283,6 @@ $(document).ready(function () {
     $('.select2Ajx').each(function (i) {
         $_this = $('.select2Ajx').eq(i);
         $_this.select2({
-            // minimumInputLength: 3,
             width: "100%",
             ajax: {
                 url: $_this.data('url'),
@@ -1331,4 +1330,13 @@ $(document).ready(function () {
         });
     });
 
+    $(document).on(
+        'change',
+        '.filter-input',
+        function(){
+            if ($('#form-filter').length) {
+                $('#form-filter').submit();
+            }
+        }
+    );
 });

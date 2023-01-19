@@ -28,7 +28,7 @@ class StockAdjustmentController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = StockOut::with(['user', 'product', 'product.unit'])->where('type', 'StockAdjustment');
+            $data = StockOut::with(['user', 'product', 'product.unit'])->where('type', 'StockAdjustment')->stockFilter();
 
             return Datatables::of($data)
                 ->addColumn('dt', function ($r) {

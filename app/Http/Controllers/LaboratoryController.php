@@ -20,7 +20,7 @@ class LaboratoryController extends Controller
     {
         if ($request->ajax()) {
             $data =  Laboratory::with(['address', 'doctor_requested', 'doctor', 'patient', 'address', 'gender'])
-                ->filter();
+                ->paraFilter();
 
             return Datatables::of($data)
                 ->addColumn('dt', function ($r) {
@@ -96,8 +96,14 @@ class LaboratoryController extends Controller
                 'sample' => $request->sample,
                 'diagnosis' => $request->diagnosis,
             ])) {
-                update4LevelAddress($request, $labor->patient()->first()->address_id);
-                $labor->update(['address_id' => update4LevelAddress($request)]);
+                if ($request->is_treament_plan) {
+                    $patient = $labor->patient()->first();
+                    $labor->update(['address_id' => duplicate4LevelAddress($request, $patient->address()->first()), 'age' => $patient->age, 'gender_id' => $patient->gender_id]);
+                } else {
+                    update4LevelAddress($request, $labor->patient()->first()->address_id);
+                    $labor->update(['address_id' => update4LevelAddress($request)]);
+                }
+
                 foreach ($request->labor_item_id as $labor_item_id) {
                     $detail = new LaborDetail;
                     $detail->create([

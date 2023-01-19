@@ -10,4 +10,9 @@ class EchoType extends BaseModel
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
+
+    public function echos()
+    {
+        return $this->hasMany(Echography::class, 'type_id');
+    }
 }

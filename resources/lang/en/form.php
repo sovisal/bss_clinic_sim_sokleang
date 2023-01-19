@@ -119,6 +119,10 @@ return [
         'result' => 'Result',
         'default_form' => 'Result',
     ],
+    'product' => [
+        'category' => 'Category',
+        'type' => 'Type',
+    ],
 
     'stock' => [
         'type' => 'Type',

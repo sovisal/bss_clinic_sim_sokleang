@@ -1,4 +1,19 @@
 <x-app-layout>
+    <x-slot name="js">
+        <script>
+            let table_columns   = [
+                {data: 'dt.name', name: 'name_en'},
+                {data: 'dt.price', name: 'price'},
+                {data: 'dt.index', name: 'index'},
+                {data: 'dt.ecgs_count', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.user', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.status', name: 'id', orderable: false, searching: false}, 
+                {data: 'dt.action', name: 'id', orderable: false, searching: false },
+            ];
+
+            initDatatableDynamic('#datatables_server', '', table_columns);
+        </script>
+    </x-slot>
     <x-slot name="header">
         @can('CreateEcgType')
         <x-form.button href="{{ route('setting.ecg-type.create') }}" label="Create" icon="bx bx-plus" />
@@ -8,20 +23,20 @@
         @endcan
     </x-slot>
     <x-card :foot="false" :head="false">
-        <x-table class="table-hover table-striped" id="datatables" data-table="patients">
+        <x-table class="table-hover table-striped" id="datatables_server" data-table="patients">
             <x-slot name="thead">
                 <tr>
-                    <th width="8%">No</th>
                     <th>Name</th>
-                    <th width="15%">Price</th>
-                    <th width="10%">Order</th>
-                    <th width="15%">User</th>
-                    <th width="12%">Status</th>
-                    <th width="15%">Action</th>
+                    <th>Price</th>
+                    <th>Order</th>
+                    <th>Total ECG</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </x-slot>
             @php($i=0)
-            @foreach($rows as $row)
+            @foreach([] as $row)
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ d_obj($row, ['name_kh', 'name_en']) }}</td>

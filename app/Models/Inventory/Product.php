@@ -9,7 +9,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends BaseModel
 {
     use HasFactory, SoftDeletes;
-	protected $guarded = ['id'];
+    protected $guarded = ['id'];
+
+    public function scopeFilter($query)
+    {
+        $query->when(request()->ft_category_id, function ($query, $category_id) {
+            $query->where('category_id', '=', $category_id);
+        });
+        $query->when(request()->ft_type_id, function ($query, $type_id) {
+            $query->where('type_id', '=', $type_id);
+        });
+        $query->when(request()->ft_status, function ($query, $status) {
+            $query->where('qty_remain', (($status == 'remain') ? '>' : '<='), 0);
+        });
+    }
 
     public function category()
     {
@@ -36,12 +49,12 @@ class Product extends BaseModel
         return $this->belongsToMany(Supplier::class, 'supplier_id');
     }
 
-    public function stockins ()
+    public function stockins()
     {
         return $this->hasMany(StockIn::class, 'product_id');
     }
 
-    public function stock_outs ()
+    public function stock_outs()
     {
         return $this->hasMany(StockOut::class, 'product_id');
     }
@@ -83,7 +96,8 @@ class Product extends BaseModel
         return $query->where('status', '>=', '1')->where('qty_remain', '>', '0');
     }
 
-    public function getAccuratePrice ($unit_id = null) {
+    public function getAccuratePrice($unit_id = null)
+    {
         if ($unit_id) {
             if ($unit_id != $this->unit_id) {
                 $matched_package = $this->packages()->where('product_unit_id', $unit_id)->first();
@@ -95,7 +109,8 @@ class Product extends BaseModel
         return $this->price;
     }
 
-    public function getCalculationQty ($unit_id = null) {
+    public function getCalculationQty($unit_id = null)
+    {
         if ($unit_id) {
             if ($unit_id != $this->unit_id) {
                 $matched_package = $this->packages()->where('product_unit_id', $unit_id)->first();
@@ -107,9 +122,10 @@ class Product extends BaseModel
         return 1;
     }
 
-    public function validateStockExist ($qty = 0, $unit_id = null) {
+    public function validateStockExist($qty = 0, $unit_id = null)
+    {
         if (env('STOCK_INVENTORY', false) == false) {
-            return [ 'status' => true ];
+            return ['status' => true];
         }
         $qty_requested = $qty * $this->getCalculationQty($unit_id);
 
@@ -120,7 +136,8 @@ class Product extends BaseModel
         ];
     }
 
-    public function deductStock ($qty = 0, $unit_id = null, $params) {
+    public function deductStock($qty = 0, $unit_id = null, $params)
+    {
 
         if (env('STOCK_INVENTORY', false) == false) {
             return true;
@@ -139,7 +156,7 @@ class Product extends BaseModel
                 }
             }
         }
-        
+
         $param_values['product_id'] = $this->id;
         $param_values['date'] = $param_values['date'] ?: date('Y-m-d');
         $param_values['price'] = $param_values['price'] ?: $this->getAccuratePrice($unit_id);
@@ -156,7 +173,7 @@ class Product extends BaseModel
                 $stockOutCreated->stock_ins()->attach([$stockIn->id => ['qty' => $requested_qty]]);
                 $stockIn->updateQty();
                 break;
-            }else{
+            } else {
                 // Case stock separate
                 $stockOutCreated->stock_ins()->attach([$stockIn->id => ['qty' => $stockIn->qty_remain]]);
                 $requested_qty -= $stockIn->qty_remain;

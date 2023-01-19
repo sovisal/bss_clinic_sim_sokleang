@@ -21,7 +21,7 @@ class BaseModel extends Model
         parent::boot();
     }
 
-    public function scopeFilter($query)
+    public function scopeParaFilter($query)
     {
         $query->when(request()->ft_daterangepicker_drp_start, function ($query, $daterangepicker_drp_start) {
             $query->where('requested_at', '>=', ($daterangepicker_drp_start . ' 00:00:00'));
@@ -30,7 +30,16 @@ class BaseModel extends Model
             $query->where('requested_at', '<=', ($daterangepicker_drp_end . ' 23:59:59'));
         });
         $query->when(request()->ft_patient_id, function ($query, $patient_id) {
-            $query->where('patient_id', '=', $patient_id);
+            $query->where('patient_id', $patient_id);
+        });
+        $query->when(request()->ft_doctor_id, function ($query, $doctor_id) {
+            $query->where('doctor_id', $doctor_id);
+        });
+        $query->when(request()->ft_status, function ($query, $status) {
+            $query->where('status', (($status=='complete')? 2 : 1));
+        });
+        $query->when(request()->ft_payment_status, function ($query, $payment_status) {
+            $query->where('payment_status', (($payment_status=='unpaid')? 0 : 1));
         });
     }
 

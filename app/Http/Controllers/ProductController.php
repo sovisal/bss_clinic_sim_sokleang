@@ -23,15 +23,14 @@ class ProductController extends Controller
             if ($request->_type == 'query') {
                 // For select2 Ajx
                 $term = Product::where(function ($query) use ($request) {
-                    $query->where('name_en', 'LIKE', '%' . $request->term . '%')
-                        ->orWhere('name_kh', 'LIKE', '%' . $request->term . '%')
-                        ->orWhere('code', 'LIKE', '%' . $request->term . '%');
-                })
+                        $query->where('name_en', 'LIKE', '%' . $request->term . '%')
+                            ->orWhere('name_kh', 'LIKE', '%' . $request->term . '%')
+                            ->orWhere('code', 'LIKE', '%' . $request->term . '%');
+                    })
                     ->when($request->qty_remain, function ($query) {
                         $query->avaiableStock();
                     })
-                    ->limit(100)
-                    ->get(['id', 'code', 'name_kh', 'name_en', 'price']);
+                    ->limit(100)->get(['id', 'code', 'name_kh', 'name_en', 'price']);
 
                 $result = [];
                 foreach ($term as $t) {
@@ -45,7 +44,7 @@ class ProductController extends Controller
                 return ['results' => $result];
             }
 
-            $data = Product::with(['user', 'unit', 'type', 'category'])->withCount('stockins');
+            $data = Product::with(['user', 'unit', 'type', 'category'])->withCount('stockins')->filter();
 
             return DataTables::of($data)
                 ->addColumn('dt', function ($r) {

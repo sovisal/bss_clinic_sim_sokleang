@@ -233,6 +233,12 @@ class AppLayout extends Component
                     'name' => ['index', 'create', 'edit'],
                     'label' => 'Medicine',
                 ],
+                'unit' => [
+                    'can' => 'ViewAnyProductUnit',
+                    'url' => route('setting.unit.index'),
+                    'name' => ['index', 'create', 'edit'],
+                    'label' => 'Unit',
+                ],
                 'doctor' => [
                     'can' => 'ViewAnyDoctor',
                     'url' => route('setting.doctor.index'),

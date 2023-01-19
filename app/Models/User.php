@@ -73,7 +73,7 @@ class User extends Authenticatable
         request()->merge($default_filter);
         $collection = parent::orderByRaw($order_by)
                             ->select($select)
-                            ->filter()
+                            ->paraFilter()
                             ->limit(5)->get();
         $response = array();
         foreach($collection as $item){
