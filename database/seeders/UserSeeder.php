@@ -62,10 +62,10 @@ class UserSeeder extends Seeder
             'password' => '$2y$10$YsiK1JXueoaXVoac1iSYT./ZNQW/K7WRYZL/JRLJ0EUG/Z.bL0xS2', // 12345678
             'position' => 'Admin',
             'doctor_id' => 1,
-            'isWebDev' => false,
+            'isWebDev' => 0,
         ]);
         
-        foreach (User::where('id', '>=', '3')->get() as $user) {
+        if ($user = User::find(5)) {
             $user->assignRole('Admin');
         } 
 

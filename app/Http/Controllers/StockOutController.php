@@ -65,6 +65,15 @@ class StockOutController extends Controller
      */
     public function store(StockOutRequest $request)
     {
+        $validator = $this->storeStockOut($request);
+        if ($validator->errors()) {
+            return redirect()->route('inventory.stock_out.index')->withErrors($validator);
+        }
+        return redirect()->route('inventory.stock_out.index')->with('success', __('alert.message.success.crud.create'));
+    }
+
+    static function storeStockOut($request, $type = 'StockOut')
+    {
         $validator = Validator::make([], []);
         $allProducts = Product::with([
             'stockins' => function ($q) {
@@ -76,9 +85,9 @@ class StockOutController extends Controller
             if ($product = $allProducts->where('id', $request->product_id[$index] ?? '')->first()) {
                 if ($product->stockins->sum('qty_remain') >= $request->qty_based[$index]) {
                     $req = (object)[
-                        'type' => 'StockOut',
+                        'type' => $type,
                         'date' => $request->date[$index],
-                        'document_no' => $request->reciept_no[$index],
+                        'document_no' => generate_code('SO', 'stock_outs'),
                         'product_id' => $request->product_id[$index],
                         'unit_id' => $request->unit_id[$index],
                         'price' => $request->price[$index],
@@ -94,10 +103,7 @@ class StockOutController extends Controller
                 }
             }
         }
-        if ($validator->errors()) {
-            return redirect()->route('inventory.stock_out.index')->withErrors($validator);
-        }
-        return redirect()->route('inventory.stock_out.index')->with('success', __('alert.message.success.crud.create'));
+        return $validator;
     }
 
     /**
@@ -125,7 +131,7 @@ class StockOutController extends Controller
     {
         return $stockOut->update([
             'date' => $request->date,
-            'document_no' => $request->reciept_no,
+            // 'document_no' => $request->reciept_no,
             'price' => $request->price,
             'total' => ($stockOut->qty * $request->price),
             'note' => $request->note,

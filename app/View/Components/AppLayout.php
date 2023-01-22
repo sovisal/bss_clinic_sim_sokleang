@@ -109,7 +109,7 @@ class AppLayout extends Component
             ],
         ]);
 
-        if (env('STOCK_INVENTORY', false) == true) {
+        if (env('STOCK_INVENTORY', true) == true) {
             $menu['inventory'] = getFirstPermittedSubMenu([
                 'can' => '',
                 'url' => '',

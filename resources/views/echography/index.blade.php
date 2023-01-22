@@ -14,7 +14,6 @@
                 margin: 10px auto;
                 overflow: hidden;
             }
-
             #image-slider .carousel-inner {
                 border-radius: 0;
             }

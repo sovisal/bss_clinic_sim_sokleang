@@ -28,9 +28,9 @@
         </td>
     </tr>
     <tr>
-        <td class="text-right">Information Diagnosis <small class="required">*</small></td>
+        <td class="text-right">Information Diagnosis</td>
         <td>
-            <x-bss-form.textarea name="evaluation_information_diagnosis" rows="4" required>{{ $consultation->evaluation_information_diagnosis }}</x-bss-form.textarea>
+            <x-bss-form.textarea name="evaluation_information_diagnosis" rows="4">{{ $consultation->evaluation_information_diagnosis }}</x-bss-form.textarea>
         </td>
     </tr>
 </table>

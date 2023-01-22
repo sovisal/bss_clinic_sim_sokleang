@@ -1,7 +1,7 @@
 <script>
     function initialize_select2_ajx () {
         $('.table-medicine select[name="medicine_id[]"]').each((_i, e) => {
-            $_this = $(e);
+            let $_this = $(e);
             $(e).select2({
                 ajax: {
                     url: $_this.data('url'),
@@ -97,7 +97,6 @@
                     id: bss_number($(this).val()),
                 },
                 success: function (rs) {
-                    console.log(rs);
                     if (rs.success) {
                         $this_row.find('[name="unit_id[]"]').html(rs.options);
                     }

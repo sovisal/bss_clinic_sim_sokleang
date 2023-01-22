@@ -19,7 +19,8 @@
         <x-bss-form.input-row name="qty[]" id="" labelWidth="15%" :tr="false" class="is_number qty" value="{{ @$row->qty }}" required label="QTY Out" />
     </tr>
     <tr>
-        <x-bss-form.input-row name="reciept_no[]" id="" labelWidth="15%" :tr="false" value="{{ @$row->reciept_no }}" label="Reciept Number" />
+        {{-- <x-bss-form.input-row name="reciept_no[]" id="" labelWidth="15%" :tr="false" value="{{ @$row->reciept_no }}" label="Reciept Number" /> --}}
+        <td colspan="2"></td>
         <x-bss-form.select-row name="unit_id[]" id="" labelWidth="15%" :tr="false" class="unit_id" :select2="false" label="Unit">
             @if (isset($row) && $row->unit_option != '')
                 {!! $row->unit_option !!}

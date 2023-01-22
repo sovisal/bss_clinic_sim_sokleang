@@ -55,7 +55,7 @@ class StockOutRequest extends FormRequest
                     $stockOuts->push((object)[
                             'type' => 'StockOut',
                             'date' => $this->date[$index],
-                            'document_no' => $this->reciept_no[$index],
+                            // 'document_no' => $this->reciept_no[$index],
                             'product_option' => '<option value="'. $product->id .'" selected>'. d_obj($product, ['name_kh','name_en']) .'</option>',
                             'product_id' => $this->product_id[$index],
                             'unit_id' => $this->unit_id[$index],

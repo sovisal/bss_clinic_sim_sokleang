@@ -9,7 +9,6 @@ use App\Models\XrayType;
 use App\Models\EcgType;
 use App\Models\LaborType;
 use App\Models\Consultation;
-use App\Models\Inventory;
 use App\Models\DataParent;
 use Illuminate\Http\Request;
 use App\Http\Requests\ConsultationRequest;
@@ -116,6 +115,11 @@ class ConsultationController extends Controller
                 'user_id' => auth()->user()->id,
             ]);
         }
+        
+        if ($request->temp_save == 'save') {
+            return redirect()->back()->with('success', __('alert.message.success.crud.update'));
+        }
+
         return redirect()->route('patient.index')->with('success', __('alert.message.success.crud.update'));
     }
 

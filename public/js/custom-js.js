@@ -1192,94 +1192,6 @@ $(document).ready(function () {
             URL.createObjectURL(evt.target.files[0]);
     });
 
-    // Selection medicine when search with no result and press Enter key, then auto createService of invoice
-    // $(document).on(
-    //     "keyup",
-    //     'select[name="medicine_id[]"] + span + span input.select2-search__field',
-    //     function (e) {
-    //         if (e.keyCode === 13) {
-    //             let current_select = $(this);
-    //             if (current_select.val()) {
-    //                 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr(
-    //                     "content"
-    //                 );
-    //                 $.ajax({
-    //                     url: window.route_medicine,
-    //                     type: "POST",
-    //                     data: {
-    //                         _token: CSRF_TOKEN,
-    //                         name: current_select.val(),
-    //                         price: "-1",
-    //                         usage_id: "1",
-    //                     },
-    //                     dataType: "JSON",
-    //                     success: function (data) {
-    //                         if (data.id) {
-    //                             let newOption = new Option(
-    //                                 current_select.val(),
-    //                                 data.id,
-    //                                 false,
-    //                                 false
-    //                             );
-    //                             $('select[name="medicine_id[]"').append(
-    //                                 newOption
-    //                             );
-    //                             current_select
-    //                                 .closest("tr")
-    //                                 .find('select[name="medicine_id[]"]')
-    //                                 .val(data.id)
-    //                                 .trigger("change");
-    //                         }
-    //                     },
-    //                 });
-    //             }
-    //         }
-    //     }
-    // );
-
-    // Selection patient when search with no result and press Enter key, then auto create
-    $(document).on(
-        "keyup",
-        'select[name="patient_id"] + span + span input.select2-search__field',
-        function (e) {
-            if (e.keyCode === 13) {
-                let current_select = $(this);
-                if (current_select.val()) {
-                    var CSRF_TOKEN = $('meta[name="csrf-token"]').attr(
-                        "content"
-                    );
-                    $.ajax({
-                        url: window.route_patient,
-                        type: "POST",
-                        data: {
-                            _token: CSRF_TOKEN,
-                            name_en: current_select.val(),
-                            name_kh: current_select.val(),
-                            registered_at: window.today,
-                        },
-                        dataType: "JSON",
-                        success: function (data) {
-                            if (data.id) {
-                                let newOption = new Option(
-                                    current_select.val(),
-                                    data.id,
-                                    false,
-                                    false
-                                );
-                                $('select[name="patient_id"').append(newOption);
-                                current_select
-                                    .closest("tr")
-                                    .find('select[name="patient_id"]')
-                                    .val(data.id)
-                                    .trigger("change");
-                            }
-                        },
-                    });
-                }
-            }
-        }
-    );
-
     $('.select2Ajx').each(function (i) {
         $_this = $('.select2Ajx').eq(i);
         $_this.select2({
@@ -1339,4 +1251,16 @@ $(document).ready(function () {
             }
         }
     );
+});
+
+// For Track and cheng if form has changed
+$.fn.extend({
+    trackChanges: function() {
+        $(":input",this).change(function() {
+            $(this.form).data("changed", true);
+        });
+    },
+    isChanged: function() { 
+        return this.data("changed"); 
+    }
 });
